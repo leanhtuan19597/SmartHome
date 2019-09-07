@@ -1,11 +1,11 @@
 #include <WiFi.h>
 #include <FirebaseESP32.h>
-    
 
-#define FIREBASE_HOST "smartagri-89400.firebaseio.com" //Do not include https:// in FIREBASE_HOST
-#define FIREBASE_AUTH "D92u4YkM3glgAlu3rFAWbh4Vr1zlaWiJbsoeRzav"
-#define WIFI_SSID "..."
-#define WIFI_PASSWORD "..." 
+#define FIREBASE_HOST "..." //Do not include https:// in FIREBASE_HOST
+#define FIREBASE_AUTH "..."
+#define WIFI_SSID "Bear's Home"
+#define WIFI_PASSWORD "anhbideptrai" 
+
 
 //Define FirebaseESP32 data object
 FirebaseData firebaseData;
@@ -14,12 +14,11 @@ int led = 2;
 int phunsuong = 19;
 int quat = 18;
 int den = 36;
- 
+
 void setup() {
 
   // setup control wifi
   Serial.begin(115200);
-  Sensor.Begin();
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to Wi-Fi");
   while (WiFi.status() != WL_CONNECTED)
@@ -41,13 +40,13 @@ void setup() {
   //Size and its write timeout e.g. tiny (1s), small (10s), medium (30s) and large (60s).
   Firebase.setwriteSizeLimit(firebaseData, "tiny");
    String path = "/Sensor";
-   
+
   //setup name của cách thiết bị trên firebase ( lúc ban đầu )
   Firebase.setInt(firebaseData,"LED",1); //setup data led on
   Firebase.setInt(firebaseData,"Phunsuong",1);
   Firebase.setInt(firebaseData,"Quat",1);
   Firebase.setInt(firebaseData,"Den",1);
-  
+
   //set up chan cho các delay 
    pinMode(2, OUTPUT);
    pinMode(19, OUTPUT); 
@@ -62,7 +61,7 @@ void relay(){
    if (Firebase.getInt(firebaseData, "LED")) {
     if (firebaseData.dataType() == "int") { // kiểm tra đúng kiểu dữ liệu 
 //        Serial.println(firebaseData.intData());
-      
+
           int fireStatus = firebaseData.intData();
           if (fireStatus == 1) {                         // compare the input of led status received from firebase
               Serial.println("Led Turned ON");                 
@@ -79,7 +78,7 @@ void relay(){
   } else {
     Serial.println(firebaseData.errorReason());
   }
-  
+
   if (Firebase.getInt(firebaseData, "Phunsuong")) { 
 //          Serial.println(firebaseData.intData());
       if (firebaseData.dataType() == "int" ) {
@@ -100,7 +99,7 @@ void relay(){
     Serial.println(firebaseData.errorReason());
   }
 // ĐIỀU KHIỂN QUẠT
- 
+
   if (Firebase.getInt(firebaseData, "Quat")) { 
 //          Serial.println(firebaseData.intData());
       if (firebaseData.dataType() == "int") { 
@@ -120,9 +119,9 @@ void relay(){
   } else {
     Serial.println(firebaseData.errorReason());
   }
-  
+
   // ĐIỀU KHIỂN ĐÈN
- 
+
   if (Firebase.getInt(firebaseData, "Den")) { 
 //          Serial.println(firebaseData.intData());
       if (firebaseData.dataType() == "int") {
