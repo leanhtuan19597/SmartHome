@@ -1,0 +1,150 @@
+#include <WiFi.h>
+#include <FirebaseESP32.h>
+    
+
+#define FIREBASE_HOST "smartagri-89400.firebaseio.com" //Do not include https:// in FIREBASE_HOST
+#define FIREBASE_AUTH "D92u4YkM3glgAlu3rFAWbh4Vr1zlaWiJbsoeRzav"
+#define WIFI_SSID "..."
+#define WIFI_PASSWORD "..." 
+
+//Define FirebaseESP32 data object
+FirebaseData firebaseData;
+// khai báo các chân cho các thiết bị
+int led = 2;
+int phunsuong = 19;
+int quat = 18;
+int den = 36;
+ 
+void setup() {
+
+  // setup control wifi
+  Serial.begin(115200);
+  Sensor.Begin();
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  Serial.print("Connecting to Wi-Fi");
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    Serial.print(".");
+    delay(300);
+  }
+  Serial.println();
+  Serial.print("Connected with IP: ");
+  Serial.println(WiFi.localIP());
+  Serial.println();
+
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+  Firebase.reconnectWiFi(true);
+
+  //Set database read timeout to 1 minute (max 15 minutes)
+  Firebase.setReadTimeout(firebaseData, 1000 * 60);
+  //tiny, small, medium, large and unlimited.
+  //Size and its write timeout e.g. tiny (1s), small (10s), medium (30s) and large (60s).
+  Firebase.setwriteSizeLimit(firebaseData, "tiny");
+   String path = "/Sensor";
+   
+  //setup name của cách thiết bị trên firebase ( lúc ban đầu )
+  Firebase.setInt(firebaseData,"LED",1); //setup data led on
+  Firebase.setInt(firebaseData,"Phunsuong",1);
+  Firebase.setInt(firebaseData,"Quat",1);
+  Firebase.setInt(firebaseData,"Den",1);
+  
+  //set up chan cho các delay 
+   pinMode(2, OUTPUT);
+   pinMode(19, OUTPUT); 
+   pinMode(18, OUTPUT); 
+   pinMode(36, OUTPUT);      
+}
+
+
+// hàm điều khiển các thiết bị (relay)
+void relay(){
+  // CONTROLL LED
+   if (Firebase.getInt(firebaseData, "LED")) {
+    if (firebaseData.dataType() == "int") { // kiểm tra đúng kiểu dữ liệu 
+//        Serial.println(firebaseData.intData());
+      
+          int fireStatus = firebaseData.intData();
+          if (fireStatus == 1) {                         // compare the input of led status received from firebase
+              Serial.println("Led Turned ON");                 
+              digitalWrite(led, LOW);                                                         // make output led ON
+              }
+          else if (fireStatus == 0) {              // compare the input of led status received from firebase
+            Serial.println("Led Turned OFF");
+            digitalWrite(led, HIGH);                                                         // make output led OFF
+          }
+           else {
+            Serial.println("Wrong Credential! Please send ON/OFF");
+          }
+    }
+  } else {
+    Serial.println(firebaseData.errorReason());
+  }
+  
+  if (Firebase.getInt(firebaseData, "Phunsuong")) { 
+//          Serial.println(firebaseData.intData());
+      if (firebaseData.dataType() == "int" ) {
+          int ps = firebaseData.intData();
+          if (ps == 1) {                         
+              Serial.println("Phun sương bật");                 
+              digitalWrite(19, LOW);                                                      
+              }
+          else if (ps == 0) {              
+            Serial.println("Phun sương tắt");
+            digitalWrite(19, HIGH);                                                         
+          }
+           else {
+            Serial.println("Sai thông số! Thử gửi bật/tắc");
+          }
+    }
+  } else {
+    Serial.println(firebaseData.errorReason());
+  }
+// ĐIỀU KHIỂN QUẠT
+ 
+  if (Firebase.getInt(firebaseData, "Quat")) { 
+//          Serial.println(firebaseData.intData());
+      if (firebaseData.dataType() == "int") { 
+          int q = firebaseData.intData();
+          if (q == 1) {                         
+              Serial.println("Quạt đã bật");                 
+              digitalWrite(18, LOW);                                                      
+              }
+          else if (q == 0) {              
+            Serial.println("Quạt đã tắt");
+            digitalWrite(18, HIGH);                                                         
+          }
+           else {
+            Serial.println("Sai thông số! Thử gửi bật/tắc");
+          }
+    }
+  } else {
+    Serial.println(firebaseData.errorReason());
+  }
+  
+  // ĐIỀU KHIỂN ĐÈN
+ 
+  if (Firebase.getInt(firebaseData, "Den")) { 
+//          Serial.println(firebaseData.intData());
+      if (firebaseData.dataType() == "int") {
+          int den = firebaseData.intData();
+          if (den == 1) {                         
+              Serial.println("Đèn đã bật");                 
+              digitalWrite(36, LOW);                                                      
+              }
+          else if (den == 0) {              
+            Serial.println("Đèn đã tắt");
+            digitalWrite(36, HIGH);                                                         
+          }
+           else {
+            Serial.println("Sai thông số! Thử gửi bật/tắc");
+          }
+    }
+  } else {
+    Serial.println(firebaseData.errorReason());
+  }
+
+}
+
+void loop() {
+  relay();
+}
