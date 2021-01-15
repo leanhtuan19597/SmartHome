@@ -1,0 +1,5 @@
+OneButton_ThreeFunction: Nhấn 1 cái on/off led 1
+			 Nhấn 2 cái on/off led 2
+			 Nhấn giữ on led 3 thả ra off led 3
+OneButton_TwoFunction:	 Nhấn 2 cái on led 1 3s rồi tắt
+			 Nhấn giữ on led 2 thả ra off led 2
